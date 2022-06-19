@@ -1,0 +1,3 @@
+ratio -> /sum
+ratio2-> /sum , zscore
+ratio3-> /sum , min max

@@ -16,9 +16,9 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn import svm
 
 
-def main():
+def main(path):
     # loading
-    df = pd.read_csv("github.csv")
+    df = pd.read_csv(path)
     print("Loaded Dataset\n", df.head())
 
     print("Dataset information")
@@ -41,10 +41,11 @@ def main():
     print(X.head())
     print(y.head())
 
-    clf = svm.SVC(kernel='poly')  # class_weight={0:train_1, 1:train_0}
+
     clf = DecisionTreeClassifier()
     clf = KNeighborsClassifier()
     clf = GaussianNB()
+    clf = svm.SVC(kernel='poly')  # class_weight={0:train_1, 1:train_0}
     experiment(X, y, clf, imbalance='none', verbose=1)
 
 
@@ -142,15 +143,17 @@ def experiment(X, y, clf, imbalance='none', verbose=0):
     '''
 
     print('')
-    print(classification_report(test_y_total, pred_y_total, labels=[0, 1]))
+    report = classification_report(test_y_total, pred_y_total, labels=[0, 1])
+    print(report)
 
     sen = np.array(sensitivity_total).mean()
     print('Sensitivity: {0:0.2f}'.format(sen))
 
-    # print('Precision:   {0:0.2f}'.format(numpy.array(precision_total).mean()))
+    print('Precision:   {0:0.2f}'.format(np.array(precision_total).mean()))
 
+    '''
     spe = np.array(specificity_total).mean()
-    print('Specificity: {0:0.2f}'.format(spe))
+    print('Specificity: {0:0.2f}'.format(spe))'''
 
     acc = np.array(accuracy_total).mean()
     print('Accuracy:    {0:0.2f}'.format(acc))
@@ -159,11 +162,12 @@ def experiment(X, y, clf, imbalance='none', verbose=0):
     print('f1:          {0:0.2f}'.format(f))
 
     cf_matrix_total = confusion_matrix(test_y_total, pred_y_total)
-    showConfusionMatrix(cf_matrix_total, type_arg='A')
+    save_path = f'{path.split(".")[0]}_{imbalance}.png'
+    showConfusionMatrix(cf_matrix_total, save_path, type_arg='A')
 
 
 # confusion matrix
-def showConfusionMatrix(cf_matrix, type_arg="A"):
+def showConfusionMatrix(cf_matrix, save_path, type_arg="A", ):
     if type_arg == 'A':
         group_names = ['TN', 'FP', 'FN', 'TP']
         group_counts = ['{0:0.0f}'.format(value) for value in cf_matrix.flatten()]
@@ -171,13 +175,18 @@ def showConfusionMatrix(cf_matrix, type_arg="A"):
         labels = [f'{v1}\n{v2}\n{v3}' for v1, v2, v3 in zip(group_names, group_counts, group_percentages)]
         labels = np.asarray(labels).reshape(2, 2)
         sns.heatmap(cf_matrix, annot=labels, fmt='', linewidths=1, cmap='Blues')
+        plt.savefig(save_path)
         plt.show()
     elif type_arg == 'S':
         sns.heatmap(cf_matrix, linewidths=1, annot=True, fmt='g')
+        plt.savefig(save_path)
         plt.show()
+
     else:
         raise ValueError("Type argument in CFMatrix can be either 'S' or 'A'")
+    return plt
 
 
 if __name__ == '__main__':
-    main()
+    path = "github_ratio3.csv"
+    main(path)
