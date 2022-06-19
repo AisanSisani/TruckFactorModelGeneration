@@ -15,9 +15,16 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import svm
 
+### just change variables below and run
+def main():
+    ### input variables
+    clf = DecisionTreeClassifier()
+    clf = KNeighborsClassifier()
+    clf = GaussianNB()
+    clf = svm.SVC(kernel='poly')  # class_weight={0:train_1, 1:train_0}
+    imbalance = 'under' # under for undersampling, over for oversampling, none for no sampling
+    path = "github_ratio3.csv"
 
-def main(path):
-    # loading
     df = pd.read_csv(path)
     print("Loaded Dataset\n", df.head())
 
@@ -42,11 +49,8 @@ def main(path):
     print(y.head())
 
 
-    clf = DecisionTreeClassifier()
-    clf = KNeighborsClassifier()
-    clf = GaussianNB()
-    clf = svm.SVC(kernel='poly')  # class_weight={0:train_1, 1:train_0}
-    experiment(X, y, clf, imbalance='none', verbose=1)
+
+    experiment(X, y, clf, imbalance=imbalance, verbose=1)
 
 
 def experiment(X, y, clf, imbalance='none', verbose=0):
@@ -188,5 +192,5 @@ def showConfusionMatrix(cf_matrix, save_path, type_arg="A", ):
 
 
 if __name__ == '__main__':
-    path = "github_ratio3.csv"
+
     main(path)
